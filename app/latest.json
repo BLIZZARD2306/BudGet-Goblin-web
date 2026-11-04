@@ -1,0 +1,7 @@
+{
+  "versionCode": 3,
+  "versionName": "1.1.2",
+  "notes": "Fixes Continue with Google. Sign out now asks first. Pick your currency (peso, dollar, euro, pound) in Settings.",
+  "apk": "https://github.com/BLIZZARD2306/BudGet-Goblin-web/releases/download/v1.1.2/budget.apk",
+  "sizeMB": 19.2
+}
