@@ -4,80 +4,468 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BudGet – Budget Goblin</title>
-  <meta name="description" content="Download the latest BudGet for Android.">
-  <link rel="icon" href="icon.png">
+  <meta name="description" content="BudGet is a friendly Android budget tracker guarded by the Budget Goblin. Log spending in a few taps, keep every card's balance straight, and take on no-spend challenges.">
+  <meta property="og:title" content="BudGet – Budget Goblin">
+  <meta property="og:description" content="A friendly Android budget tracker, guarded by the Budget Goblin.">
+  <meta property="og:image" content="https://budget-goblin.vercel.app/mascot.png">
+  <meta name="theme-color" content="#131f24">
+  <link rel="icon" href="icon.png?v=3">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f7f1ea; --panel: #ffffff; --border: #e8e2dc; --text: #3b3d4a; --muted: #9a958f;
-      --mint: #2fc46e; --mint-lip: #1fa75a; --coral: #ff7b4a;
+      --bg: #f7f1ea; --bg-alt: #efe7de; --panel: #ffffff; --border: #e8e2dc; --text: #3b3d4a; --muted: #8a857f;
+      --mint: #2fc46e; --mint-lip: #1fa75a; --mint-soft: #2fc46e22;
+      --coral: #ff7b4a; --sun: #ffc23d; --sky: #4aa8ff; --grape: #a974ff; --rose: #ff5d7a;
+      --screen: #131f24; --screen-panel: #202f36; --screen-border: #37464f; --screen-text: #f1f7fb; --screen-muted: #8ea0a9;
     }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #131f24; --panel: #202f36; --border: #37464f; --text: #f1f7fb; --muted: #8ea0a9; }
+      :root {
+        --bg: #131f24; --bg-alt: #17252b; --panel: #202f36; --border: #37464f; --text: #f1f7fb; --muted: #8ea0a9;
+        --mint-soft: #2fc46e1f;
+        --screen: #0d171b; --screen-panel: #1a282e; --screen-border: #2c3b43;
+      }
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
-      font-family: Nunito, system-ui, sans-serif; font-weight: 600;
-      display: flex; align-items: center; justify-content: center; padding: 32px 16px;
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: Nunito, system-ui, sans-serif; font-weight: 600; line-height: 1.5;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
     }
-    main { width: 100%; max-width: 420px; text-align: center; }
-    .goblin { width: 168px; height: 168px; image-rendering: pixelated; }
-    h1 { font-weight: 900; font-size: 40px; margin: 8px 0 4px; letter-spacing: -0.5px; }
-    .tag { color: var(--muted); margin: 0 0 28px; font-size: 17px; }
-    .panel {
-      background: var(--panel); border: 2px solid var(--border); border-bottom-width: 5px;
-      border-radius: 18px; padding: 22px; text-align: left;
+    img.px { image-rendering: pixelated; }
+    a { color: inherit; }
+    .wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    .icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in srgb, var(--bg) 85%, transparent);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--border);
     }
-    .version { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    .version b { font-weight: 900; font-size: 20px; }
-    .version span { color: var(--muted); font-size: 14px; }
-    .notes { margin: 10px 0 20px; line-height: 1.5; }
-    .notes:empty { display: none; }
+    header .wrap { display: flex; align-items: center; gap: 24px; height: 68px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 900; font-size: 22px; letter-spacing: -0.3px; }
+    .brand img { width: 36px; height: 36px; border-radius: 10px; }
+    nav { display: flex; gap: 22px; margin-left: auto; }
+    nav a { text-decoration: none; color: var(--muted); font-weight: 800; }
+    nav a:hover { color: var(--text); }
+
+    /* Buttons */
     .button {
-      display: block; text-align: center; text-decoration: none; color: #fff; background: var(--mint);
-      font-weight: 900; font-size: 17px; letter-spacing: 1px; text-transform: uppercase;
-      padding: 16px; border-radius: 16px; box-shadow: 0 5px 0 var(--mint-lip);
-      transition: transform 80ms, box-shadow 80ms;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      text-decoration: none; color: #fff; background: var(--mint);
+      font-weight: 900; font-size: 16px; letter-spacing: 1px; text-transform: uppercase;
+      padding: 15px 26px; border-radius: 16px; box-shadow: 0 5px 0 var(--mint-lip);
+      transition: transform 80ms, box-shadow 80ms, filter 120ms;
     }
+    .button:hover { filter: brightness(1.05); }
     .button:active { transform: translateY(5px); box-shadow: 0 0 0 var(--mint-lip); }
+    .button.small { padding: 10px 16px; font-size: 13px; border-radius: 12px; box-shadow: 0 4px 0 var(--mint-lip); }
+    .button.small:active { transform: translateY(4px); }
     .button[aria-disabled="true"] { opacity: .5; pointer-events: none; }
-    ol { color: var(--muted); font-size: 14px; line-height: 1.6; padding-left: 20px; margin: 20px 0 0; }
-    footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
+    .button.ghost { background: var(--panel); color: var(--text); border: 2px solid var(--border); box-shadow: 0 5px 0 var(--border); }
+    .button.ghost:active { box-shadow: 0 0 0 var(--border); }
+
+    /* Hero */
+    .hero { padding: 72px 0 88px; }
+    .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+    h1 { font-weight: 900; font-size: clamp(40px, 6vw, 64px); line-height: 1.04; letter-spacing: -1.5px; margin: 0 0 18px; }
+    h1 em { font-style: normal; color: var(--mint); }
+    .lede { font-size: 19px; color: var(--muted); max-width: 520px; margin: 0 0 30px; }
+    .cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    .release {
+      margin-top: 28px; max-width: 520px; padding: 16px 18px;
+      background: var(--panel); border: 2px solid var(--border); border-bottom-width: 5px; border-radius: 18px;
+    }
+    .release-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .release-head b { font-weight: 900; }
+    .release-head span { color: var(--muted); font-size: 14px; }
+    .release p { margin: 6px 0 0; font-size: 15px; }
+    .release p:empty { display: none; }
+    .meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 18px; color: var(--muted); font-size: 14px; }
+    .meta span { display: inline-flex; align-items: center; gap: 6px; }
+    .meta .icon { width: 17px; height: 17px; color: var(--mint); }
+
+    /* Phone mockup */
+    .stage { position: relative; display: flex; justify-content: center; }
+    .stage::before {
+      content: ""; position: absolute; width: 420px; height: 420px; max-width: 100vw; border-radius: 50%;
+      background: radial-gradient(circle, #2fc46e40, transparent 65%); top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .device { position: relative; } /* the bubble is placed against the phone, not the whole column */
+    .phone {
+      position: relative; width: 300px; padding: 12px; border-radius: 44px;
+      background: #0a1114; box-shadow: 0 0 0 2px #2a383f, 0 30px 60px -20px #00000080;
+      transform: rotate(3deg);
+    }
+    .screen {
+      background: var(--screen); color: var(--screen-text); border-radius: 34px; padding: 18px 16px 20px;
+      font-size: 13px; overflow: hidden; text-align: left;
+    }
+    .s-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .s-pills { display: flex; gap: 6px; }
+    .s-pill { background: var(--screen-panel); border: 1.5px solid var(--screen-border); border-radius: 999px; padding: 3px 9px; font-weight: 800; font-size: 11px; }
+    .s-pill.hot { color: var(--coral); } .s-pill.gold { color: var(--sun); }
+    .s-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--grape); position: relative; }
+    .s-avatar::after { content: ""; position: absolute; right: -1px; bottom: -1px; width: 9px; height: 9px; border-radius: 50%; background: var(--mint); border: 2px solid var(--screen); }
+    .s-card { background: var(--screen-panel); border: 1.5px solid var(--screen-border); border-bottom-width: 4px; border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+    .s-label { color: var(--screen-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; }
+    .s-big { font-weight: 900; font-size: 30px; letter-spacing: -0.5px; line-height: 1.1; margin: 2px 0 8px; }
+    .s-bar { height: 10px; border-radius: 99px; background: var(--screen-border); overflow: hidden; }
+    .s-bar i { display: block; height: 100%; width: 62%; background: var(--mint); border-radius: 99px; }
+    .s-sub { display: flex; justify-content: space-between; color: var(--screen-muted); font-size: 11px; margin-top: 6px; }
+    .s-week { display: flex; align-items: flex-end; justify-content: space-between; height: 64px; gap: 6px; margin-top: 10px; }
+    .s-week i { flex: 1; background: var(--screen-border); border-radius: 5px 5px 2px 2px; }
+    .s-week i.today { background: var(--mint); }
+    .s-days { display: flex; justify-content: space-between; color: var(--screen-muted); font-size: 10px; margin-top: 4px; }
+    .s-days span { flex: 1; text-align: center; }
+    .s-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+    .s-row + .s-row { border-top: 1.5px solid var(--screen-border); }
+    .s-cat { width: 28px; height: 28px; border-radius: 9px; flex: none; }
+    .s-row b { font-weight: 800; } .s-row small { display: block; color: var(--screen-muted); font-size: 10px; }
+    .s-row .amt { margin-left: auto; font-weight: 900; }
+    .s-row .amt.in { color: var(--mint); }
+    .bubble {
+      position: absolute; left: -64px; bottom: 76px; display: flex; align-items: center; gap: 8px; text-align: left;
+      background: var(--panel); color: var(--text); border: 2px solid var(--border); border-bottom-width: 5px;
+      border-radius: 18px; padding: 8px 14px 8px 8px; font-weight: 800; font-size: 14px; max-width: 220px;
+      transform: rotate(-3deg); animation: bob 3.2s ease-in-out infinite;
+    }
+    .bubble img { width: 52px; height: 52px; }
+    @keyframes bob { 50% { transform: rotate(-3deg) translateY(-8px); } }
+
+    /* Sections */
+    section.block { padding: 88px 0; }
+    .alt { background: var(--bg-alt); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
+    .head { text-align: center; max-width: 620px; margin: 0 auto 48px; }
+    .kicker { color: var(--mint); font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; font-size: 13px; }
+    h2 { font-weight: 900; font-size: clamp(30px, 4vw, 42px); letter-spacing: -1px; line-height: 1.1; margin: 8px 0 12px; }
+    .head p { color: var(--muted); font-size: 18px; margin: 0; }
+
+    .panel { background: var(--panel); border: 2px solid var(--border); border-bottom-width: 5px; border-radius: 20px; }
+
+    /* Moods */
+    .moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .mood { padding: 22px 18px 20px; text-align: center; }
+    .mood img { width: 96px; height: 96px; transition: transform 200ms; }
+    .mood:hover img { transform: scale(1.1) rotate(-4deg); }
+    .mood b { display: block; font-weight: 900; font-size: 18px; margin-top: 6px; }
+    .mood span { color: var(--muted); font-size: 15px; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feature { padding: 24px; }
+    .chip { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 14px; color: #fff; }
+    .feature h3 { font-weight: 900; font-size: 19px; margin: 0 0 6px; }
+    .feature p { margin: 0; color: var(--muted); }
+
+    /* Challenges */
+    .split { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: center; }
+    .split .copy p { color: var(--muted); font-size: 18px; margin: 0; }
+    .split .copy img { width: 120px; height: 120px; display: block; }
+    .challenges { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .challenge { padding: 18px; display: flex; gap: 14px; align-items: center; }
+    .challenge .days {
+      width: 56px; height: 56px; border-radius: 16px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 22px; line-height: 1; background: var(--mint-soft); color: var(--mint);
+    }
+    .challenge .days small { font-size: 10px; letter-spacing: .5px; text-transform: uppercase; margin-top: 2px; }
+    .challenge b { font-weight: 900; display: block; }
+    .challenge span { color: var(--muted); font-size: 14px; }
+
+    /* Install */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: s; }
+    .step { padding: 24px; }
+    .step::before {
+      counter-increment: s; content: counter(s);
+      width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+      background: var(--mint); color: #fff; font-weight: 900; box-shadow: 0 4px 0 var(--mint-lip); margin-bottom: 14px;
+    }
+    .step h3 { font-weight: 900; font-size: 18px; margin: 0 0 6px; }
+    .step p { margin: 0; color: var(--muted); }
+    .faq { max-width: 760px; margin: 48px auto 0; display: grid; gap: 12px; }
+    details { padding: 0 20px; }
+    summary { cursor: pointer; list-style: none; font-weight: 900; font-size: 17px; padding: 18px 0; display: flex; justify-content: space-between; gap: 16px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--mint); font-size: 22px; line-height: 1; transition: transform 160ms; }
+    details[open] summary::after { transform: rotate(45deg); }
+    details p { margin: 0 0 18px; color: var(--muted); }
+
+    /* Final CTA */
+    .final { text-align: center; padding: 96px 0; border-bottom: 0; }
+    .final img { width: 140px; height: 140px; }
+    .final h2 { margin-top: 4px; }
+    .final p { color: var(--muted); font-size: 18px; margin: 0 0 28px; }
+
+    footer { border-top: 2px solid var(--border); padding: 28px 0; color: var(--muted); font-size: 14px; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+    footer a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 800; }
+    footer a:hover { color: var(--text); }
+    footer .icon { width: 18px; height: 18px; }
+
+    .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity 500ms ease, transform 500ms ease; }
+    .js .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .js .reveal { opacity: 1; transform: none; transition: none; }
+      .bubble { animation: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    @media (max-width: 960px) {
+      .hero .wrap, .split { grid-template-columns: 1fr; gap: 48px; }
+      .hero { padding-top: 48px; text-align: center; }
+      .lede, .release { margin-left: auto; margin-right: auto; }
+      .release { text-align: left; }
+      .cta, .meta { justify-content: center; }
+      .features, .moods { grid-template-columns: repeat(2, 1fr); }
+      .split .copy { text-align: center; }
+      .split .copy img { margin: 0 auto; }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 16px; }
+      nav { display: none; }
+      header .button { margin-left: auto; }
+      .features, .steps, .challenges { grid-template-columns: 1fr; }
+      .moods { gap: 12px; }
+      .mood { padding: 16px 10px; }
+      .mood img { width: 72px; height: 72px; }
+      .phone { width: 270px; transform: rotate(2deg); }
+      .bubble { left: 0; bottom: -36px; max-width: 210px; font-size: 13px; }
+      .hero { padding-bottom: 96px; }
+      section.block { padding: 64px 0; }
+      .cta .button { width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <img class="goblin" src="mascot.png" alt="The Budget Goblin celebrating">
-    <h1>BudGet</h1>
-    <p class="tag">Your Budget Goblin keeps an eye on your money.</p>
-    <section class="panel">
-      <div class="version"><b id="version">Latest version</b><span id="size"></span></div>
-      <p class="notes" id="notes"></p>
-      <a class="button" id="download" href="app/budget.apk" download>Download for Android</a>
-      <ol>
-        <li>Open the downloaded file on your phone.</li>
-        <li>If asked, allow your browser to install apps.</li>
-        <li>Already have BudGet? It updates itself when you open it.</li>
-      </ol>
+  <script>document.documentElement.classList.add("js");</script>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="i-pie" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-8-5"/></symbol>
+  </svg>
+
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#top"><img src="icon.png?v=3" alt="">BudGet</a>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#challenges">Challenges</a>
+        <a href="#install">Install</a>
+      </nav>
+      <a class="button small dl" href="app/budget.apk" download>Download</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <h1>Your money has a <em>goblin</em> now.</h1>
+          <p class="lede">BudGet is a friendly budget tracker. Log what you spend in a few taps, keep every card's balance straight, and let the Budget Goblin cheer you on, or panic with you.</p>
+          <div class="cta">
+            <a class="button dl" href="app/budget.apk" download><svg class="icon"><use href="#i-download"/></svg>Download for Android</a>
+            <a class="button ghost" href="#features">See what it does</a>
+          </div>
+          <div class="release" id="release">
+            <div class="release-head"><b id="version">Latest version</b><span id="size"></span></div>
+            <p id="notes"></p>
+          </div>
+          <div class="meta">
+            <span><svg class="icon"><use href="#i-phone"/></svg>Android 7.0 or newer</span>
+            <span><svg class="icon"><use href="#i-refresh"/></svg>Updates itself</span>
+            <span><svg class="icon"><use href="#i-shield"/></svg>No passwords</span>
+          </div>
+        </div>
+
+        <div class="stage" aria-hidden="true">
+          <div class="device">
+          <div class="phone">
+            <div class="screen">
+              <div class="s-top">
+                <div class="s-pills"><span class="s-pill hot">12 day streak</span><span class="s-pill gold">3 trophies</span></div>
+                <span class="s-avatar"></span>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Remaining this period</div>
+                <div class="s-big">₱7,640</div>
+                <div class="s-bar"><i></i></div>
+                <div class="s-sub"><span>₱12,360 spent</span><span>Resets Nov 15</span></div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">This week</div>
+                <div class="s-week"><i style="height:45%"></i><i style="height:70%"></i><i style="height:30%"></i><i style="height:85%"></i><i style="height:50%"></i><i class="today" style="height:38%"></i><i style="height:6%"></i></div>
+                <div class="s-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Recent</div>
+                <div class="s-row"><span class="s-cat" style="background:var(--coral)"></span><div><b>Lunch</b><small>Food · Cash</small></div><span class="amt">−₱180</span></div>
+                <div class="s-row"><span class="s-cat" style="background:var(--sky)"></span><div><b>Jeep fare</b><small>Transport · GCash</small></div><span class="amt">−₱26</span></div>
+                <div class="s-row"><span class="s-cat" style="background:var(--mint)"></span><div><b>Side gig</b><small>Income · Debit</small></div><span class="amt in">+₱1,500</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="bubble"><img class="px" src="img/goblin-proud.png" alt="">Under budget again. Proud of you.</div>
+          </div>
+        </div>
+      </div>
     </section>
-    <footer>Android 7.0 or newer</footer>
+
+    <section class="block alt">
+      <div class="wrap">
+        <div class="head reveal">
+          <div class="kicker">Meet the goblin</div>
+          <h2>It reacts to every peso.</h2>
+          <p>The Budget Goblin watches your spending and lets you know how you're doing, no charts required.</p>
+        </div>
+        <div class="moods">
+          <div class="panel mood reveal"><img class="px" src="img/goblin-proud.png" alt="Proud goblin"><b>Proud</b><span>when you save</span></div>
+          <div class="panel mood reveal"><img class="px" src="img/goblin-anxious.png" alt="Nervous goblin"><b>Nervous</b><span>when a budget runs low</span></div>
+          <div class="panel mood reveal"><img class="px" src="img/goblin-sad.png" alt="Sad goblin"><b>Sad</b><span>when you go over</span></div>
+          <div class="panel mood reveal"><img class="px" src="img/goblin-level_up.png" alt="Celebrating goblin"><b>Hyped</b><span>when you win a challenge</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="features">
+      <div class="wrap">
+        <div class="head reveal">
+          <div class="kicker">Features</div>
+          <h2>Everything a budget needs. Nothing it doesn't.</h2>
+          <p>No spreadsheets. Just your money, where it went, and what's left.</p>
+        </div>
+        <div class="features">
+          <div class="panel feature reveal">
+            <div class="chip" style="background:var(--mint)"><svg class="icon"><use href="#i-calendar"/></svg></div>
+            <h3>Follows your payday</h3>
+            <p>Monthly, twice a month, every 2 weeks or weekly. Your remaining budget resets when you get paid.</p>
+          </div>
+          <div class="panel feature reveal">
+            <div class="chip" style="background:var(--grape)"><svg class="icon"><use href="#i-wallet"/></svg></div>
+            <h3>A wallet for every card</h3>
+            <p>Cash, e-wallets, debit and credit cards, each with its own balance and a full history that adds up.</p>
+          </div>
+          <div class="panel feature reveal">
+            <div class="chip" style="background:var(--coral)"><svg class="icon"><use href="#i-pie"/></svg></div>
+            <h3>See where it went</h3>
+            <p>Spending by category, income vs. spent, a 20% savings goal and a goblin report on the biggest bite.</p>
+          </div>
+          <div class="panel feature reveal">
+            <div class="chip" style="background:var(--sky)"><svg class="icon"><use href="#i-users"/></svg></div>
+            <h3>Split with friends</h3>
+            <p>Enter the total and how many people. Only your share is logged.</p>
+          </div>
+          <div class="panel feature reveal">
+            <div class="chip" style="background:var(--sun)"><svg class="icon"><use href="#i-refresh"/></svg></div>
+            <h3>Synced across phones</h3>
+            <p>Your budget follows you to every phone you sign in on, and a dot shows when it's up to date.</p>
+          </div>
+          <div class="panel feature reveal">
+            <div class="chip" style="background:var(--rose)"><svg class="icon"><use href="#i-mail"/></svg></div>
+            <h3>No passwords</h3>
+            <p>Sign in with Google or an email link. Peso, dollar, euro or pound. Light or dark.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block alt" id="challenges">
+      <div class="wrap split">
+        <div class="copy reveal">
+          <img class="px" src="img/goblin-guarding.png" alt="Goblin guarding a piggy bank">
+          <div class="kicker">Challenges</div>
+          <h2>Make saving a game.</h2>
+          <p>Start a challenge and a live countdown begins. Log a matching expense and it breaks. Finish it and you earn a trophy, and a very happy goblin.</p>
+        </div>
+        <div class="challenges">
+          <div class="panel challenge reveal"><div class="days">7<small>days</small></div><div><b>No shopping</b><span>Hands off the cart.</span></div></div>
+          <div class="panel challenge reveal"><div class="days">5<small>days</small></div><div><b>No coffee runs</b><span>Brew it at home.</span></div></div>
+          <div class="panel challenge reveal"><div class="days">3<small>days</small></div><div><b>No fun spending</b><span>Free fun only.</span></div></div>
+          <div class="panel challenge reveal"><div class="days">2<small>days</small></div><div><b>No-spend weekend</b><span>Nothing goes out.</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="install">
+      <div class="wrap">
+        <div class="head reveal">
+          <div class="kicker">Install</div>
+          <h2>Up and running in a minute.</h2>
+          <p>BudGet installs straight from this page, no Play Store needed.</p>
+        </div>
+        <div class="steps">
+          <div class="panel step reveal"><h3>Download</h3><p>Tap Download on your phone. The file is about <span class="size-inline">20 MB</span>.</p></div>
+          <div class="panel step reveal"><h3>Open the file</h3><p>Open it from your notifications or Downloads. If asked, allow your browser to install apps.</p></div>
+          <div class="panel step reveal"><h3>Meet your goblin</h3><p>Set your payday and budget. From then on, BudGet updates itself when you open it.</p></div>
+        </div>
+
+        <div class="faq">
+          <details class="panel reveal"><summary>Why isn't it on the Play Store?</summary><p>BudGet is shared directly from here. Google Play Protect may ask to scan it the first time, since it didn't come from the Play Store. That's normal.</p></details>
+          <details class="panel reveal"><summary>How do updates work?</summary><p>When you open BudGet, it checks for a new version and offers to download and install it. The first time, Android asks you to let BudGet install apps.</p></details>
+          <details class="panel reveal"><summary>Who can see my data?</summary><p>Only you. Each account can read and write its own data and nothing else. Deleting your account removes everything from the cloud.</p></details>
+          <details class="panel reveal"><summary>Do I need an account?</summary><p>Signing in with Google or an email link lets BudGet sync across your phones. Opened the email on a computer? Type the 6-digit code the app shows and your phone signs in.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final alt">
+      <div class="wrap reveal">
+        <img class="px" src="mascot.png" alt="The Budget Goblin celebrating">
+        <h2>The goblin is waiting.</h2>
+        <p>Your future savings will thank you.</p>
+        <a class="button dl" href="app/budget.apk" download><svg class="icon"><use href="#i-download"/></svg>Download for Android</a>
+      </div>
+    </section>
   </main>
+
+  <footer>
+    <div class="wrap">
+      <span>BudGet · Android 7.0 or newer</span>
+      <a href="https://github.com/BLIZZARD2306/BudGet"><svg class="icon"><use href="#i-github"/></svg>Source on GitHub</a>
+    </div>
+  </footer>
+
   <script>
+    const buttons = document.querySelectorAll(".dl");
     fetch("app/latest.json", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((v) => {
-        document.getElementById("version").textContent = "Version " + v.versionName;
-        if (v.apk) document.getElementById("download").href = new URL(v.apk, new URL("app/", location.href)).href;
+        document.getElementById("version").textContent = "What's new in " + v.versionName;
         document.getElementById("notes").textContent = v.notes || "";
-        if (v.sizeMB) document.getElementById("size").textContent = v.sizeMB + " MB";
+        if (v.apk) {
+          const href = new URL(v.apk, new URL("app/", location.href)).href;
+          buttons.forEach((b) => (b.href = href));
+        }
+        if (v.sizeMB) {
+          document.getElementById("size").textContent = v.sizeMB + " MB";
+          document.querySelectorAll(".size-inline").forEach((s) => (s.textContent = v.sizeMB + " MB"));
+        }
       })
       .catch(() => {
-        document.getElementById("version").textContent = "No release yet";
-        document.getElementById("download").setAttribute("aria-disabled", "true");
+        document.getElementById("release").hidden = true;
+        buttons.forEach((b) => b.setAttribute("aria-disabled", "true"));
       });
+
+    const reveals = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+      }, { threshold: 0.12 });
+      reveals.forEach((el, i) => { el.style.transitionDelay = (i % 4) * 70 + "ms"; io.observe(el); });
+    } else {
+      reveals.forEach((el) => el.classList.add("in"));
+    }
   </script>
 </body>
 </html>
